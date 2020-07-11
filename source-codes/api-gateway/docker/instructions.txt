@@ -1,0 +1,2 @@
+docker build -f Dockerfile -t alessandroargentieri/exp-gateway .
+docker push alessandroargentieri/exp-gateway

@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service              
+metadata:
+  name: frontend-lb
+spec:
+  type: LoadBalancer       
+  ports:
+  - port: 80              
+    targetPort: 80
+  selector:            
+    app: frontend    
+---
+apiVersion:  apps/v1 #extensions/v1beta1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 2                                             
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate                                   
+    rollingUpdate: 
+      maxUnavailable: 1                                   
+      maxSurge: 1                                         
+  selector:
+    matchLabels:
+      app: frontend
+      tier: experiment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: frontend
+        tier: experiment
+    spec:
+      containers:
+      - image: alessandroargentieri/exp-frontend-nginx
+        name: frontend
+        env:
+        - name: OAUTH2_CLIENT_ID
+          value: "efe81665e4bbab322bb8"
+        - name: FRONTEND_HOST
+          value:  "https://example.com" # "http://192.168.64.2:32065"     # http://frontend-lb  
+        - name: LOGIN_REDIRECT_PATH
+          value: "login.html" # "login/oauth2/code/github"
+        - name: OAUTH2_STATE
+          value: "fknrrdyjikfn"
+        - name: OAUTH2_SCOPE
+          value: "user"   
+        - name: GATEWAY_HOST
+          value: "https://example.com" # "https://example.com/api" # "http://192.168.64.2:32392"    # http://gateway-lb
+        - name: GATEWAY_ROOT_PATH
+          value: "javalin-api-gateway"
+        - name: OAUTH2_RESOURCE_PROVIDER_URL
+          value: "https://github.com/login/oauth/authorize"   
+        ports:
+        - containerPort: 80
+          name: frontend
