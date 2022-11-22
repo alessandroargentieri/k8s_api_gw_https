@@ -1,4 +1,4 @@
-ISTRUZIONI IN ORDINE*******************************************************************************************************************************************
+ISTRUZIONI IN ORDINE*************************************************************************
 ~~~~~~~~~~~~~
 1. attivare l'addons ingress
 minikube addons list
@@ -241,6 +241,7 @@ CMD ["java", "-jar", "/app/microservice.jar"]
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+In the frontend manifest, the FE refers to itself with the public IP, not with the k8s service address because the ajax calls in a web page don't pass for the kube-proxy but need direct access to a public address.
 
 $ cat frontend-nginx-deployment.yaml 
 apiVersion: v1
@@ -296,7 +297,7 @@ spec:
         - name: OAUTH2_SCOPE
           value: "user"   
         - name: GATEWAY_HOST
-          value: "https://example.com" # "https://example.com/api" # "http://192.168.64.2:32392"    # http://gateway-lb
+          value: "https://example.com" # "https://example.com/api" # "http://192.168.64.2:32392"    # this won't work: http://gateway-lb
         - name: GATEWAY_ROOT_PATH
           value: "javalin-api-gateway"
         - name: OAUTH2_RESOURCE_PROVIDER_URL
